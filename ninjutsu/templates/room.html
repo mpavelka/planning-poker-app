@@ -1,0 +1,31 @@
+{% extends "_base.html" %}
+{% block content %}
+<script src="https://unpkg.com/vue@3"></script>
+<script type="text/javascript">
+	window.room_uuid = "{{ room_uuid }}"
+</script>
+
+{% raw %}
+<div id="app">
+{{ message }}
+
+{% for result in results %}
+
+</div>
+
+
+<script>
+// The websocket
+const socket = new WebSocket("ws://"+window.location.host+window.location.pathname+'/ws')
+
+// Vue app
+Vue.createApp({
+  data() {
+    return {
+      message: 'Hello Vue!' + window.room_uuid
+    }
+  }
+}).mount('#app')
+</script>
+{% endraw %}
+{% endblock %}
