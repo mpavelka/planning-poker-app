@@ -2,28 +2,75 @@
 {% block content %}
 <script src="https://unpkg.com/vue@3"></script>
 <script type="text/javascript">
-	window.room_uuid = "{{ room_uuid }}"
+    window.room_uuid = "{{ room_uuid }}"
 </script>
 
 {% raw %}
 <div id="app">
-{{ message }}
-
-{% for result in results %}
-
+    <div class="votes">
+        <div class="vote" v-for="vote in votes">
+            <p v-if="vote.value">{{ vote.value }}</p>
+            <p v-if="!vote.value">X</p>
+        </div>
+    </div>
+    <div class="controls">
+    </div>
 </div>
 
 
 <script>
-// The websocket
-const socket = new WebSocket("ws://"+window.location.host+window.location.pathname+'/ws')
-
 // Vue app
 Vue.createApp({
   data() {
-    return {
-      message: 'Hello Vue!' + window.room_uuid
+    const data = {
+      message: 'Hello Vue!' + window.room_uuid,
+      test: this.test,
+      playerId: this.playerId,
+      status: this.status,
+      votes: this.votes,
     }
+    return data;
+  },
+
+  mounted() {
+    const that = this;
+    // The websocket
+    this.socket = new WebSocket("ws://"+window.location.host+window.location.pathname+'/ws')
+    // Listen for messages
+    this.socket.addEventListener('message', function (event) {
+        // Parse event
+        const parts = event.data.split(" ");
+        const evName = parts[0]
+
+        switch(evName) {
+            case "WELCOME":
+                that.playerId = parseInt(parts[1])
+                break;
+            case "ROOM_STATE":
+                const status = parts[1]
+                that.status = status
+
+                switch(status) {
+                    case "PROGRESS":
+                        that.votes = parts.slice(2).map(user => {
+                            const parts = user.split(":")
+                            return {
+                                userId: parseInt(parts[0]),
+                                value: parts[1].toLowerCase() == "true",
+                            }
+                        })
+                        break;
+                }
+                break;
+        }
+
+        console.log('Message from server ', event.data);
+    });
+    this.test = "test";
+  },
+
+  unmounted() {
+    this.socket.close()
   }
 }).mount('#app')
 </script>

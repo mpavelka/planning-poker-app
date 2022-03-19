@@ -80,7 +80,6 @@ class NinjutsuApp(object):
 
         # Welcome player!
         await ws.send_str("WELCOME {}".format(player.id))
-        await ws.send_str(self._create_message_room_state(room))
 
         async for msg in ws:
             if msg.type == aiohttp.WSMsgType.TEXT:
@@ -112,7 +111,12 @@ class NinjutsuApp(object):
     def _create_message_room_state(self, room):
         if room.status == RoomStatus.PROGRESS:
             return "ROOM_STATE PROGRESS {}".format(
-                " ".join(["{}".format(player.id) for player in room.get_players()])
+                " ".join(
+                    [
+                        "{}:{}".format(player.id, vote is not None)
+                        for player, vote in room.get_votes()
+                    ]
+                )
             )
 
         elif room.status == RoomStatus.RESULT:
