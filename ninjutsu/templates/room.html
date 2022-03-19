@@ -6,14 +6,23 @@
 </script>
 
 {% raw %}
-<div id="app">
-    <div class="votes">
+<div id="app" style="text-align: center;">
+    <div class="results">
         <div class="vote" v-for="vote in votes">
-            <p v-if="vote.value">{{ vote.value }}</p>
-            <p v-if="!vote.value">X</p>
+            <p v-if="vote.value && status == 'PROGRESS'">X</p>
+            <p v-if="vote.value && status == 'RESULT'">{{ vote.value }}</p>
+            <p v-if="!vote.value">-</p>
         </div>
     </div>
+    <div class="options">
+        <button v-on:click="vote(1)">1</button>
+        <button v-on:click="vote(2)">2</button>
+        <button v-on:click="vote(3)">3</button>
+        <button v-on:click="vote(5)">5</button>
+        <button v-on:click="vote(8)">8</button>
+    </div>
     <div class="controls">
+        <button v-if="status == 'RESULT'" v-on:click="reset()">reset</button>
     </div>
 </div>
 
@@ -60,6 +69,15 @@ Vue.createApp({
                             }
                         })
                         break;
+                    case "RESULT":
+                        that.votes = parts.slice(2).map(user => {
+                            const parts = user.split(":")
+                            return {
+                                userId: parseInt(parts[0]),
+                                value: parseInt(parts[1]),
+                            }
+                        })
+                        break;
                 }
                 break;
         }
@@ -71,7 +89,17 @@ Vue.createApp({
 
   unmounted() {
     this.socket.close()
+  },
+
+  methods: {
+    vote(value) {
+      this.socket.send("VOTE "+value)
+    },
+    reset(value) {
+      this.socket.send("RESET")
+    }
   }
+
 }).mount('#app')
 </script>
 {% endraw %}

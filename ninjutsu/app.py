@@ -85,6 +85,15 @@ class NinjutsuApp(object):
             if msg.type == aiohttp.WSMsgType.TEXT:
                 if msg.data == "close":
                     await ws.close()
+                elif msg.data == "RESET":
+                    room.reset()
+                elif msg.data.startswith("VOTE"):
+                    try:
+                        value = int(msg.data.split()[1])
+                    except Exception as e:
+                        print(e)
+                        continue
+                    room.vote(player, value)
                 else:
                     await ws.send_str(msg.data + "/answer")
             elif msg.type == aiohttp.WSMsgType.ERROR:
