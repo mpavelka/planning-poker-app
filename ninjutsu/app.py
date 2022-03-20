@@ -20,7 +20,8 @@ class NinjutsuApp(object):
         self._loop = asyncio.get_event_loop()
 
     def run(self):
-        aiohttp.web.run_app(self._webapp)
+        port = int(os.environ.get("PORT", 8080))
+        aiohttp.web.run_app(self._webapp, port=port)
 
     def _create_webapp(self):
         webapp = aiohttp.web.Application()
