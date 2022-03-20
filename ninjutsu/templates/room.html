@@ -3,6 +3,26 @@
 <script src="https://unpkg.com/vue@3"></script>
 <script type="text/javascript">
     window.room_uuid = "{{ room_uuid }}"
+    const audioVolume = 0.3;
+    function newAudio(url, volume) {
+        const audio = new Audio(url);
+        audio.volume = volume ? volume : audioVolume;
+        return audio;
+    }
+    const ninjaScreamAudio = [
+        newAudio('/static/audio/202037__thestigmata__man-die.mp3'),
+        newAudio('/static/audio/369593__eflexmusic__hard-punch-to-gut-indoor-large-room.mp3'),
+        newAudio('/static/audio/44267__erdie__male-fight07.mp3'),
+        newAudio('/static/audio/442288__rockittt__male-pain-sound-effects-A.mp3'),
+        newAudio('/static/audio/442288__rockittt__male-pain-sound-effects-B.mp3'),
+        newAudio('/static/audio/442288__rockittt__male-pain-sound-effects-C.mp3'),
+    ]
+    const swordSliceAudio = [
+        newAudio('/static/audio/344131__thebuilder15__sword-slice.mp3'),
+        newAudio('/static/audio/591155__ultraaxvii__sword-contact-with-swipe.mp3'),
+        newAudio('/static/audio/462983__bastianhallo__knife-being-sharpened.mp3'),
+        newAudio('/static/audio/504615__neospica__slicing-through-flesh.mp3'),
+    ]
 </script>
 
 {% raw %}
@@ -55,12 +75,19 @@ Vue.createApp({
             case "WELCOME":
                 that.playerId = parseInt(parts[1])
                 break;
+            case "VOTE":
+                // Sword slice!
+                const sound = swordSliceAudio[Math.floor(Math.random() * swordSliceAudio.length)];
+                sound.pause();
+                sound.currentTime = 0;
+                sound.play()
+                break;
             case "ROOM_STATE":
                 const status = parts[1]
-                that.status = status
 
                 switch(status) {
                     case "PROGRESS":
+                        that.status = status
                         that.votes = parts.slice(2).map(user => {
                             const parts = user.split(":")
                             return {
@@ -70,6 +97,14 @@ Vue.createApp({
                         })
                         break;
                     case "RESULT":
+                        if (that.status != "RESULT") {
+                            // Hai!
+                            const sound = ninjaScreamAudio[Math.floor(Math.random() * ninjaScreamAudio.length)];
+                            sound.pause();
+                            sound.currentTime = 0;
+                            sound.play()
+                        }
+                        that.status = status
                         that.votes = parts.slice(2).map(user => {
                             const parts = user.split(":")
                             return {

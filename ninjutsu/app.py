@@ -1,4 +1,5 @@
 import asyncio
+import os
 import uuid
 
 import aiohttp.web
@@ -29,9 +30,13 @@ class NinjutsuApp(object):
                 aiohttp.web.post("/", self._handle_new_room),
                 aiohttp.web.get(r"/room/{room_id}", self._handle_get_room, name="room"),
                 aiohttp.web.get(r"/room/{room_id}/ws", self._handle_room_ws),
+                aiohttp.web.static("/static", os.path.join("ninjutsu", "static")),
             ]
         )
         return webapp
+
+    async def _handle_static_file(self, request):
+        pass
 
     async def _handle_get_home(self, request):
         return aiohttp.web.Response(
@@ -113,9 +118,16 @@ class NinjutsuApp(object):
 
     def _room_subscriber(self, room, event, **kwargs):
         print(room, event, kwargs)
+        if event == "vote_placed":
+            asyncio.create_task(
+                self._send_str_to_room(room, self._create_message_vote_placed(**kwargs))
+            )
         asyncio.create_task(
             self._send_str_to_room(room, self._create_message_room_state(room))
         )
+
+    def _create_message_vote_placed(self, player, vote):
+        return "VOTE {}".format(player.id)
 
     def _create_message_room_state(self, room):
         if room.status == RoomStatus.PROGRESS:
@@ -142,4 +154,8 @@ class NinjutsuApp(object):
         players = room.get_players()
         for player in players:
             if player in self._ws:
-                await self._ws[player].send_str(message)
+                try:
+                    await self._ws[player].send_str(message)
+                except Exception as e:
+                    print(e)
+                    await self._ws[player].close()
