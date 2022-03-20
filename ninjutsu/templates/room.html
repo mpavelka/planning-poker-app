@@ -75,7 +75,7 @@ Vue.createApp({
     this.playerVote = null;
     this.sound = true;
     // The websocket
-    this.socket = new WebSocket("ws://"+window.location.host+window.location.pathname+'/ws')
+    this.socket = new WebSocket((window.location.protocol == "https:" ? "wss://" : "ws://")+window.location.host+window.location.pathname+'/ws')
     // Listen for messages
     this.socket.addEventListener('message', function (event) {
         // Parse event
