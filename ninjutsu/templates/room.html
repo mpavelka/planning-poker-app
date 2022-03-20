@@ -6,7 +6,7 @@
 <script src="https://unpkg.com/vue@3"></script>
 <script type="text/javascript">
     window.room_uuid = "{{ room_uuid }}"
-    const audioVolume = 0.3;
+    const audioVolume = 0.2;
     function newAudio(url, volume) {
         const audio = new Audio(url);
         audio.volume = volume ? volume : audioVolume;
@@ -14,11 +14,11 @@
     }
     const ninjaScreamAudio = [
         // newAudio('/static/audio/202037__thestigmata__man-die.mp3'),
-        newAudio('/static/audio/369593__eflexmusic__hard-punch-to-gut-indoor-large-room.mp3'),
-        newAudio('/static/audio/44267__erdie__male-fight07.mp3'),
-        newAudio('/static/audio/442288__rockittt__male-pain-sound-effects-A.mp3'),
-        newAudio('/static/audio/442288__rockittt__male-pain-sound-effects-B.mp3'),
-        newAudio('/static/audio/442288__rockittt__male-pain-sound-effects-C.mp3'),
+        newAudio('/static/audio/369593__eflexmusic__hard-punch-to-gut-indoor-large-room.mp3', audioVolume+0.2),
+        newAudio('/static/audio/44267__erdie__male-fight07.mp3', audioVolume+0.2),
+        newAudio('/static/audio/442288__rockittt__male-pain-sound-effects-A.mp3', audioVolume+0.2),
+        newAudio('/static/audio/442288__rockittt__male-pain-sound-effects-B.mp3', audioVolume+0.2),
+        newAudio('/static/audio/442288__rockittt__male-pain-sound-effects-C.mp3', audioVolume+0.2),
     ]
     const swordSliceAudio = [
         newAudio('/static/audio/344131__thebuilder15__sword-slice.mp3'),
@@ -49,7 +49,7 @@
         <button v-on:click="toggleSound()">{{ this.sound ? "sound on" : "sound off" }}</button>
     </div>
     <div class="credits">
-        <p><a href="https://github.com/mpavelka/planning-poker-app" target="_blank" class="name">Ninjitsu Planning Poker</a></p><p class="author">(Miloslav Pavelka, 2022)</p>
+        <p><a href="https://github.com/mpavelka/planning-poker-app" target="_blank" class="name">Ninjutsu Planning Poker</a></p><p class="author">(Miloslav Pavelka, 2022)</p>
     </div>
 </div>
 
