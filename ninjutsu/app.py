@@ -14,6 +14,7 @@ class NinjutsuApp(object):
             loader=PackageLoader("ninjutsu"),
             autoescape=select_autoescape(),
         )
+        self._jinja.globals["BASE_URL"] = os.environ.get("BASE_URL", "")
         self._webapp = self._create_webapp()
         self._ws = {}
         self._rooms = {}
