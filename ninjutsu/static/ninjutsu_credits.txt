@@ -1,0 +1,26 @@
+# Ninjutsu Planning Poker
+
+## Author
+
+- Miloslav Pavelka
+- GitHub: https://github.com/mpavelka/planning-poker-app
+
+## Images
+- https://icon-icons.com/icon/github-square/195795
+- https://freesvg.org/1535162072
+
+## Audio files
+
+Screaming:
+- https://freesound.org/people/oldedgar/sounds/97977/
+- https://freesound.org/people/Robinhood76/sounds/125767/
+- https://freesound.org/people/EFlexMusic/sounds/369593/
+- https://freesound.org/people/rockittt/sounds/442288/
+- https://freesound.org/people/Erdie/sounds/44267/
+- https://freesound.org/people/thestigmata/sounds/202037/
+
+Sword:
+- https://freesound.org/people/TheBuilder15/sounds/344131/
+- https://freesound.org/people/ultraaxvii/sounds/591155/
+- https://freesound.org/people/Bastianhallo/sounds/462983/
+- https://freesound.org/people/NeoSpica/sounds/504615/

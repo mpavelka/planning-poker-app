@@ -46,7 +46,7 @@ class NinjutsuApp(object):
         )
 
     async def _handle_new_room(self, request):
-        location = request.app.router["room"].url_for()
+        location = request.app.router["room"].url_for(room_id=str(uuid.uuid4()))
         raise aiohttp.web.HTTPFound(location=location)
 
     async def _handle_get_room(self, request):

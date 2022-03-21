@@ -1,3 +1,12 @@
 {% extends "_base.html" %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="/static/home.css">
+{% endblock %}
 {% block content %}
+<img style="width:  100px" src="/static/img/1535162072.svg">
+<h1>Ninjutsu Planning Poker</h1>
+<form method="post">
+	<button class="btn btn-light" type="submit">New room</button>
+</form>
+{% include '_credits.html' %}
 {% endblock %}

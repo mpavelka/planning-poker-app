@@ -36,21 +36,21 @@
         </div>
     </div>
     <div class="ballots">
-        <button v-on:click="vote(1)">1</button>
-        <button v-on:click="vote(2)">2</button>
-        <button v-on:click="vote(3)">3</button>
-        <button v-on:click="vote(5)">5</button>
-        <button v-on:click="vote(8)">8</button>
+        <button class="btn btn-dark" v-on:click="vote(1)">1</button>
+        <button class="btn btn-dark" v-on:click="vote(2)">2</button>
+        <button class="btn btn-dark" v-on:click="vote(3)">3</button>
+        <button class="btn btn-dark" v-on:click="vote(5)">5</button>
+        <button class="btn btn-dark" v-on:click="vote(8)">8</button>
     </div>
     <div class="controls">
-        <button v-if="status == 'RESULT'" v-on:click="reset()">reset</button>
+        <button class="btn btn-dark" v-if="status == 'RESULT'" v-on:click="reset()">reset</button>
     </div>
     <div class="settings">
-        <button v-on:click="toggleSound()">{{ this.sound ? "sound on" : "sound off" }}</button>
+        <button class="btn btn-sm btn-light" v-on:click="toggleSound()">{{ this.sound ? "sound on" : "sound off" }}</button>
     </div>
-    <div class="credits">
-        <p><a href="https://github.com/mpavelka/planning-poker-app" target="_blank" class="name">Ninjutsu Planning Poker</a></p><p class="author">(Miloslav Pavelka, 2022)</p>
-    </div>
+    {% endraw %}
+    {% include '_credits.html' %}
+    {% raw %}
 </div>
 
 

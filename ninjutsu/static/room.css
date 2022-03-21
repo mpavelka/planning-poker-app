@@ -2,8 +2,14 @@
 	text-align: center;
 }
 
-body {
-	background-color:  aliceblue;
+.controls {
+	padding-bottom: 3rem;
+}
+.ballots>button.btn {
+	margin: 0.2rem;
+}
+.controls>button.btn {
+	margin: 0.2rem;
 }
 
 .results {
@@ -18,13 +24,6 @@ body {
 	font-size: 1.5rem;
 	background-color: white;
 }
-
-.credits {
-	padding-top: 3rem;
-}
-.credits>p {
-	margin-bottom: 0.5rem;
-}
-.credits>.author {
-	font-size: .8rem;
+.settings {
+	padding-bottom: 1rem;
 }
