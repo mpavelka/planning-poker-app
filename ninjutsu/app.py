@@ -88,33 +88,34 @@ class NinjutsuApp(object):
         # Welcome player!
         await ws.send_str("WELCOME {}".format(player.id))
 
-        async for msg in ws:
-            if msg.type == aiohttp.WSMsgType.TEXT:
-                if msg.data == "close":
-                    await ws.close()
-                elif msg.data == "RESET":
-                    room.reset()
-                elif msg.data.startswith("VOTE"):
-                    try:
-                        value = int(msg.data.split()[1])
-                    except Exception as e:
-                        print(e)
-                        continue
-                    room.vote(player, value)
-                else:
-                    await ws.send_str(msg.data + "/answer")
-            elif msg.type == aiohttp.WSMsgType.ERROR:
-                print("ws connection closed with exception %s" % ws.exception())
+        try:
+            async for msg in ws:
+                if msg.type == aiohttp.WSMsgType.TEXT:
+                    if msg.data == "close":
+                        await ws.close()
+                    elif msg.data == "RESET":
+                        room.reset()
+                    elif msg.data.startswith("VOTE"):
+                        try:
+                            value = int(msg.data.split()[1])
+                        except Exception as e:
+                            print(e)
+                            continue
+                        room.vote(player, value)
+                    else:
+                        await ws.send_str(msg.data + "/answer")
+                elif msg.type == aiohttp.WSMsgType.ERROR:
+                    print("ws connection closed with exception %s" % ws.exception())
+        finally:
+            print("websocket connection closed")
+            room.remove_player(player)
+            del self._ws[player]
 
-        print("websocket connection closed")
-        room.remove_player(player)
-        del self._ws[player]
-
-        # Was this the last player?
-        # Clean up garbage
-        if len(room.get_players()) == 0:
-            room.unsubscribe(self._room_subscriber)
-            del self._rooms[room_uuid]
+            # Was this the last player?
+            # Clean up garbage
+            if len(room.get_players()) == 0:
+                room.unsubscribe(self._room_subscriber)
+                del self._rooms[room_uuid]
 
         return ws
 
