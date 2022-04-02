@@ -23,10 +23,14 @@ function runRoomApp(room_uuid, selector) {
 
 
   return Vue.createApp({
+  	beforeCreate: function() {
+      this.playerId = null;
+      this.playerVote = null;
+      this.sound = true;
+	  },
     data() {
       const data = {
-        message: 'Hello Vue!' + room_uuid,
-        test: this.test,
+        msg: "msg",
         playerId: this.playerId,
         playerVote: this.playerVote,
         status: this.status,
@@ -38,10 +42,16 @@ function runRoomApp(room_uuid, selector) {
 
     mounted() {
       const that = this;
-      this.playerVote = null;
-      this.sound = true;
       // The websocket
       this.socket = new WebSocket((window.location.protocol == "https:" ? "wss://" : "ws://")+window.location.host+window.location.pathname+'/ws')
+      // Connection opened
+      this.socket.addEventListener('open', function (event) {
+        if (window.location.search.includes("observer")) {
+          that.socket.send("GETSTATE")
+        } else {
+        	that.socket.send("JOIN")
+        }
+      });
       // Listen for messages
       this.socket.addEventListener('message', function (event) {
           // Parse event
@@ -50,8 +60,9 @@ function runRoomApp(room_uuid, selector) {
 
           switch(evName) {
               case "WELCOME":
-                  that.playerId = parseInt(parts[1])
+                  that.playerId = parts[1];
                   break;
+
               case "VOTE":
                   // Sword slice!
                   if (that.sound) {
@@ -61,7 +72,7 @@ function runRoomApp(room_uuid, selector) {
                       sound.play()
                       break;
                   }
-                  
+
               case "ROOM_STATE":
                   const status = parts[1]
 
@@ -76,6 +87,7 @@ function runRoomApp(room_uuid, selector) {
                               }
                           })
                           break;
+
                       case "RESULT":
                           if (that.sound && that.status != "RESULT") {
                               // Hai!
@@ -97,10 +109,8 @@ function runRoomApp(room_uuid, selector) {
                   }
                   break;
           }
-
           console.log('Message from server ', event.data);
       });
-      this.test = "test";
     },
 
     unmounted() {

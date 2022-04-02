@@ -25,19 +25,23 @@ class Room:
 
     def subscribe(self, subscriber):
         self._subscribers.append(subscriber)
+        print("New subscriber to room '{}'".format(self._id))
 
     def unsubscribe(self, subscriber):
         self._subscribers.remove(subscriber)
+        print("Subscriber removed from room '{}'".format(self._id))
 
     def new_player(self):
         player = Player(id=self._counter.next())
         self._votes[player] = None
-        self._publish("new_player", player=player)
         self._set_status(RoomStatus.PROGRESS)
+        self._publish("new_player", player=player)
+        print("New player '{}' in room '{}'".format(player.id, self._id))
         return player
 
     def remove_player(self, player):
         del self._votes[player]
+        print("Player '{}' removed from room '{}'".format(player.id, self._id))
         self._publish("remove_player", player=player)
 
         if self._all_voted():
@@ -46,6 +50,14 @@ class Room:
     def vote(self, player, vote):
         self._votes[player] = vote
         self._publish("vote_placed", player=player, vote=vote)
+
+        print(
+            "Player '{}' voted in room '{}': '{}'".format(
+                player.id,
+                self._id,
+                vote,
+            )
+        )
 
         if self._all_voted():
             self._set_status(RoomStatus.RESULT)
@@ -75,6 +87,7 @@ class Room:
     def _set_status(self, status):
         self.status = status
         self._publish("status_changed", status=status)
+        print("Room '{}' status changed to '{}'".format(self._id, status))
 
 
 class Player:

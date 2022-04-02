@@ -18,6 +18,7 @@ class NinjutsuApp(object):
         self._webapp = self._create_webapp()
         self._ws = {}
         self._rooms = {}
+        self._room_subscribers = {}
         self._loop = asyncio.get_event_loop()
 
     def run(self):
@@ -69,33 +70,39 @@ class NinjutsuApp(object):
         except Exception:
             raise aiohttp.web.HTTPNotFound()
 
+        # Create websocket for the new player
+        ws = aiohttp.web.WebSocketResponse()
+        await ws.prepare(request)
+
         # Is there a room object for this uuid?
         if room_uuid not in self._rooms:
             room = Room(id=room_uuid)
-            room.subscribe(self._room_subscriber)
+            room.subscribe(self._room_event_handler)
             self._rooms[room_uuid] = room
+            self._room_subscribers[room] = [ws]
         else:
             room = self._rooms[room_uuid]
+            self._room_subscribers[room].append(ws)
 
         # New player
-        player = room.new_player()
-
-        # Create websocket for the new player
-        ws = aiohttp.web.WebSocketResponse()
-        self._ws[player] = ws
-        await ws.prepare(request)
-
-        # Welcome player!
-        await ws.send_str("WELCOME {}".format(player.id))
+        player = None
 
         try:
             async for msg in ws:
                 if msg.type == aiohttp.WSMsgType.TEXT:
                     if msg.data == "close":
                         await ws.close()
+                    elif msg.data == "JOIN":
+                        player = room.new_player()
+                        self._ws[player] = ws
+                        await ws.send_str("WELCOME {}".format(player.id))
                     elif msg.data == "RESET":
                         room.reset()
+                    elif msg.data == "GETSTATE":
+                        await ws.send_str(self._create_message_room_state(room))
                     elif msg.data.startswith("VOTE"):
+                        if not player:
+                            continue
                         try:
                             value = int(msg.data.split()[1])
                         except Exception as e:
@@ -108,19 +115,31 @@ class NinjutsuApp(object):
                     print("ws connection closed with exception %s" % ws.exception())
         finally:
             print("websocket connection closed")
-            room.remove_player(player)
-            del self._ws[player]
+            if player:
+                room.remove_player(player)
+                del self._ws[player]
 
-            # Was this the last player?
+            # Remove websocket from room events listeners
+            self._room_subscribers[room].remove(ws)
+
+            #
+            # Was this the last subscriber?
             # Clean up garbage
-            if len(room.get_players()) == 0:
-                room.unsubscribe(self._room_subscriber)
+            print(
+                "There are {} websockets subscribed to room {}".format(
+                    len(self._room_subscribers[room]),
+                    room._id,
+                )
+            )
+            if len(self._room_subscribers[room]) == 0:
+                room.unsubscribe(self._room_event_handler)
+                del self._room_subscribers[room]
                 del self._rooms[room_uuid]
+                print("Unsubscribed from room '{}' events".format(room_uuid))
 
         return ws
 
-    def _room_subscriber(self, room, event, **kwargs):
-        print(room, event, kwargs)
+    def _room_event_handler(self, room, event, **kwargs):
         if event == "vote_placed":
             asyncio.create_task(
                 self._send_str_to_room(room, self._create_message_vote_placed(**kwargs))
@@ -154,11 +173,12 @@ class NinjutsuApp(object):
             )
 
     async def _send_str_to_room(self, room, message):
-        players = room.get_players()
-        for player in players:
-            if player in self._ws:
-                try:
-                    await self._ws[player].send_str(message)
-                except Exception as e:
-                    print(e)
-                    await self._ws[player].close()
+        if room not in self._room_subscribers:
+            return
+
+        for ws in self._room_subscribers[room]:
+            try:
+                await ws.send_str(message)
+            except Exception as e:
+                print(e)
+                await ws.close()

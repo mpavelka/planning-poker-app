@@ -14,17 +14,25 @@
             {{ getVoteDisplayValue(vote) }}
         </div>
     </div>
-    <div class="ballots">
+    <div class="ballots" v-if="playerId">
         <button class="btn btn-dark" v-on:click="vote(1)">1</button>
         <button class="btn btn-dark" v-on:click="vote(2)">2</button>
         <button class="btn btn-dark" v-on:click="vote(3)">3</button>
         <button class="btn btn-dark" v-on:click="vote(5)">5</button>
         <button class="btn btn-dark" v-on:click="vote(8)">8</button>
     </div>
-    <div class="controls">
+    <div class="controls" v-if="playerId">
         <button class="btn btn-dark" v-if="status == 'RESULT'" v-on:click="reset()">reset</button>
     </div>
     <div class="settings">
+        <form v-if="playerId" style="display: inline-block;padding:.5rem;">
+            <input type="hidden" name="observer" value="1">
+            <button class="btn btn-sm btn-light">observe</button>
+        </form>
+        <form v-if="!playerId" style="display: inline-block;padding:.5rem;">
+            <input type="hidden" name="player" value="">
+            <button class="btn btn-sm btn-success">play</button>
+        </form>
         <button class="btn btn-sm btn-light" v-on:click="toggleSound()">{{ this.sound ? "sound on" : "sound off" }}</button>
     </div>
     {% endraw %}
